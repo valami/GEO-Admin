@@ -17,7 +17,7 @@
 		
 		if (isset($_POST['username']))	{
 			$user= Login($_POST['username'],$_POST['password']);
-			if (! is_null($user))
+			if (! $user == "NotExist")
 			{				
 				$_POST = array();
 				$_SESSION['uname'] = $user->uname;

@@ -58,7 +58,6 @@
 		$uname = mysqli_real_escape_string($conn, $uname);
 		$passwd = mysqli_real_escape_string($conn, $passwd);
 		$sql = "SELECT * FROM Felhasznalok WHERE username='".$uname."' and password='".strtoupper(hash('sha256', $passwd))."' ";
-		print $sql;
 		$result = $conn->query($sql);			
 		$user = array();
 		if ($result->num_rows > 0) {
