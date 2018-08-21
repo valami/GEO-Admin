@@ -72,19 +72,25 @@
 			
 		?>
 		
-		<div class="container static">
-				<ol class="breadcrumb" >
-                <div class="row">
-                    <div class="col-sm-8">
-					<form action="#" method="post" class='form-horizontal' style="margin-bottom: 0px">
-						<button type='submit' value='add' class='glyphicon glyphicon-plus btn btn-success' name='btn'>Hozzáadás</button>		
-					</form>
-					</div>
-                    <div class="col-sm-4">
-						<input class="form-control" id="keres" type="text" placeholder="Keresés..">
-                    </div>    
+		<div class="container static">		
+			<?php 
+				if (isset($_POST['error']))
+				{
+					print "<div class='alert alert-danger input-errors'><p>".$_POST['error']."</p></div>";
+				}
+			?>
+			<ol class="breadcrumb" >
+			<div class="row">
+				<div class="col-sm-8">
+				<form action="#" method="post" class='form-horizontal' style="margin-bottom: 0px">
+					<button type='submit' value='add' class='glyphicon glyphicon-plus btn btn-success' name='btn'>Hozzáadás</button>		
+				</form>
 				</div>
-			</ol>
+				<div class="col-sm-4">
+					<input class="form-control" id="keres" type="text" placeholder="Keresés..">
+				</div>    
+			</div>
+		</ol>
 		
 				
 			<table  class="table table-bordered" >

@@ -82,7 +82,7 @@
 				$arr[] = new user($row['id'],$row['username'],$row['realname'],$row['email'],$row['permission'] );
 			}
 		} else {
-			print "Hiba csúszott  a rendszerbe";
+			$_POST['error'] = "Hiba történt";
 		}
 		return $arr;
 	}
@@ -99,7 +99,7 @@
 				break;
 			}
 		} else {
-			$_SESSION['error'] = "Hiba történt";
+			$_POST['error'] = "Hiba történt";
 		}
 		return $arr[0];
 	}
@@ -107,14 +107,20 @@
 	function AddUser($user,$passwd)
 	{
 		global $conn;
+		$sql = $conn->prepare ("INSERT INTO `Felhasznalok` (`username`, `password`, `realname`, `email`, `permission`) VALUES (?,?,?,?,?)");		
+		$sql->bind_param('ssssd', $uname, $passwd, $rname, $email, $permission);
 		$passwd = strtoupper(hash('sha256', $passwd));
-		$sql = "INSERT INTO `Felhasznalok` (`username`, `password`, `realname`, `email`, `permission`) VALUES ('".$user->uname."', '".$passwd."', '".$user->rname."', '".$user->email."', '".$user->permission."')";
-		if ($conn->query($sql) === TRUE) {
+		$uname = mysqli_real_escape_string($conn,$user->uname);		
+		$rname = mysqli_real_escape_string($conn,$user->rname);		
+		$email = mysqli_real_escape_string($conn,$user->email);
+		$permission = mysqli_real_escape_string($conn,$user->permission);
+		if ($sql->execute())
+		{
 			$_POST = array();
 			echo  "<meta http-equiv='refresh' content='0'>";
-		} else {
-			echo "Error: " . $sql . "<br>" . $conn->error;
-		}		
+		}	else	{
+			$_POST['Error'] = "Felhasználó létrehozása sikertelen!";
+		}
 	}
 	
 	function DelUser($id)
@@ -126,7 +132,7 @@
 			$_POST = array();
 			echo  "<meta http-equiv='refresh' content='0'>";
 		} else {
-			echo "Error deleting record: " . $conn->error;
+			$_POST['Error'] = "Felhasználó törlése sikertelen!";
 		}
 	}
 	
@@ -138,7 +144,7 @@
 			$_POST = array();
 			echo  "<meta http-equiv='refresh' content='0'>";
 		} else {
-			echo "Error: " . $sql . "<br>" . $conn->error;
+			$_POST['Error'] = "Felhasználó módisítása sikertelen!";
 		}		
 	}	
 	
@@ -149,7 +155,7 @@
 		$sql = "UPDATE `Felhasznalok` SET `password` = '".$passwd."' WHERE `id` = ".$id."";
 		if ($conn->query($sql) === TRUE) {
 		} else {
-			echo "Error: " . $sql . "<br>" . $conn->error;
+			$_POST['Error'] = "Jelszó törlése sikertelen!";
 		}		
 	}
 ?>
