@@ -8,16 +8,16 @@
 	</head>
 	<body>
 		<?php
-			session_start();
 			$active = "Eszkozok";
 			include('./includes/header.php');	
-			include('./includes/function-devices.php');	
-			if (!isset($_SESSION['uname']) ){
+			include('./includes/function-devices.php');			
+			if (isset($_SESSION['uname']) )
+			{
+				if ($_SESSION['permission'] < 8)
+				{
 					header("Location: index.php");
-			}
-
-			include('./includes/devices.php');		
-		
+				}
+			}		
 			
 			//Rendezés
 			if (isset($_POST['order']))
@@ -28,7 +28,7 @@
 				$order = "name asc"; //Alapértelmezett
 			}
 			
-			$devices[] = ListUserDevices($order);
+			$devices[] = ListAllDevices($order);
 			
 			if (isset($_POST['btn']))
 			{
@@ -74,20 +74,23 @@
                 <div class="row">
                     <div class="col-sm-8">
 					<form action="#" method="post" class='form-horizontal' style="margin-bottom: 0px">
-						<button type='submit' value='add' class='glyphicon glyphicon-plus btn btn-success' name='btn'>Hozzáadás</button>					
+						<button type='submit' value='add' class='glyphicon glyphicon-plus btn btn-success' name='btn'>Hozzáadás</button>				
 					</form>
 					</div>
                     <div class="col-sm-4">
 						<input class="form-control" id="keres" type="text" placeholder="Keresés..">
                     </div>    
             </div>
-			</ol>
-		
+			</ol>		
 				
 			<table  class="table table-bordered" >
 			<thead>
 				<tr>
 					<form action="#" method="post">
+					<th>Tulajdonos
+						<button type='submit' value='username asc' class='glyphicon glyphicon-menu-down' name='order' style='background:transparent; border:none; '></button>
+						<button type='submit' value='username desc' class='glyphicon glyphicon-menu-up' name='order' style='background:transparent; border:none; '></button>
+					</th>
 					<th>Név
 						<button type='submit' value='name asc' class='glyphicon glyphicon-menu-down' name='order' style='background:transparent; border:none; '></button>
 						<button type='submit' value='name desc' class='glyphicon glyphicon-menu-up' name='order' style='background:transparent; border:none; '></button>
@@ -118,17 +121,18 @@
 						foreach ($devices[0] as $item)
 						{						
 							print "<tr>";
-									print "<td>".$item->name."</td>";									
-									print "<td>".$item->ip."</td>";									
-									print "<td>".strtoupper($item->mac)."</td>";									
-									print "<td>".$item->downwrite."</td>";
-									print "<td>".$item->upwrite."</td>";
-									
-									print "<td>
-										<button type='submit' value='mod_".$item->id."' class='glyphicon glyphicon-pencil' name='btn' style='background:transparent; border:none; '></button>
-										<button type='submit' value='del_".$item->id."' class='glyphicon glyphicon-remove' name='btn' style='background:transparent; border:none; '></button>
-										<button type='submit' value='".$item->ip."' class='glyphicon glyphicon-list-alt' name='btn' style='background:transparent; border:none; '></button>
-									</td>";								
+								print "<td>".$item->GetUser()."</td>";
+								print "<td>".$item->name."</td>";										
+								print "<td>".$item->ip."</td>";									
+								print "<td>".strtoupper($item->mac)."</td>";									
+								print "<td>".$item->downwrite."</td>";
+								print "<td>".$item->upwrite."</td>";
+								
+								print "<td>
+									<button type='submit' value='mod_".$item->id."' class='glyphicon glyphicon-pencil' name='btn' style='background:transparent; border:none; '></button>
+									<button type='submit' value='del_".$item->id."' class='glyphicon glyphicon-remove' name='btn' style='background:transparent; border:none; '></button>
+									<button type='submit' value='".$item->ip."' class='glyphicon glyphicon-list-alt' name='btn' style='background:transparent; border:none; '></button>
+								</td>";								
 							print "</tr>";
 						}		
 					?>

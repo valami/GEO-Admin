@@ -1,6 +1,6 @@
 <?php
 	require('./includes/dbconfig.php');	
-	
+	require('./includes/function-users.php');
 	class device{
 		public $id;
 		public $uid;
@@ -9,6 +9,8 @@
 		public $mac;
 		public $uplimit;
 		public $up="0";
+		public $upwrite;
+		public $downwrite;
 		public $down="0";
 		
 		function __construct($_id,$_uid,$_name,$_ip,$_mac,$_uplimit)	
@@ -18,12 +20,82 @@
 			$this->name = $_name;
 			$this->ip = $_ip;
 			$this->mac = $_mac;
-			$this->uplimit = $_uplimit;		
-		}
+			$this->uplimit = $_uplimit;	
+			$this->up = $this->GetUp($_ip);
+			$this->down = $this->GetDown($_ip);
+			$this->upwrite =$this->GetWrite($this->up);			
+			$this->downwrite =$this->GetWrite($this->down);
+		}	
 		
 		function SetName($_name)
 		{
 			$this->name = $_name;
+		}
+
+		function GetUser ()
+		{
+			return SearchUser($this->uid)->rname;
+		}
+		function GetUp ($_ip)
+		{
+			$dbconn = pg_connect("host=193.225.227.1 dbname=bandwidthd user=postgres password=titok") or die('Could not connect: ' . pg_last_error());
+			$result = pg_query($dbconn, "			
+			select sum (total)
+			from bd_tx_log 
+			where timestamp  > now()::date and ip ='".$_ip ."'
+			group by ip
+			having sum(total) > 1
+			");			
+			while ($line = pg_fetch_row($result)) {
+				return $line[0];
+			}			
+			// Free resultset
+			pg_free_result($result);			
+			// Closing connection
+			pg_close($dbconn);		
+		}
+		function GetDown ($_ip)
+		{
+			$dbconn = pg_connect("host=193.225.227.1 dbname=bandwidthd user=postgres password=titok") or die('Could not connect: ' . pg_last_error());
+			$result = pg_query($dbconn, "			
+			select sum (total)
+			from bd_rx_log 
+			where timestamp  > now()::date and ip ='".$_ip ."'
+			group by ip
+			having sum(total) > 1
+			");			
+			while ($line = pg_fetch_row($result)) {
+				return $line[0];
+			}			
+			// Free resultset
+			pg_free_result($result);			
+			// Closing connection
+			pg_close($dbconn);		
+		}
+		function GetWrite($in)
+		{
+			$Max = 1024;
+			$Output = $in;
+			$Suffix = 'KB';
+		
+			if ($Output > $Max)
+			{
+				$Output /= 1024;
+				$Suffix = 'MB';
+			}
+		
+			if ($Output > $Max)
+			{
+				$Output /= 1024;
+				$Suffix = 'GB';
+			}
+		
+			if ($Output > $Max)
+			{
+				$Output /= 1024;
+				$Suffix = 'TB';
+			}					
+			return( round( $Output , 2 )." ".$Suffix);			
 		}
 	}	
 	
@@ -42,7 +114,22 @@
 		}
 		return $arr;
 	}
-	
+		
+	function ListAllDevices ($order)
+	{		
+		global $conn;		
+		$sql = "SELECT * FROM `Eszkozok`    ORDER BY ".$order."  ";
+		$result = $conn->query($sql);			
+		$arr = array();
+		if ($result->num_rows > 0) {
+			while($row = $result->fetch_assoc()) {
+				$arr[] = new device($row["id"],$row["user_id"],$row["name"],$row["ip"],$row["mac"],$row["uplimit"]);
+			}
+		} else {
+			$_SESSION['error'] = "Hiba csúszott  a rendszerbe";
+		}
+		return $arr;
+	}
 	function SearchDevice ($id)
 	{
 		global $conn;
@@ -95,5 +182,22 @@
 		} else {
 			echo "Error deleting record: " . $conn->error;
 		}
+	}
+
+	function FirstIP()
+	{
+		global $conn;
+		$sql = "SELECT * FROM `Eszkozok` WHERE `id` = ".$id."" ;
+		$result = $conn->query($sql);			
+		$clients = array();
+		if ($result->num_rows > 0) {
+			while($row = $result->fetch_assoc()) {
+				$arr[] = new device($row["id"],$row["user_id"],$row["name"],$row["ip"],$row["mac"],$row["uplimit"]);
+				break;
+			}
+		} else {
+			$_SESSION['error'] = "Hiba történt";
+		}
+		return $arr[0];
 	}
 ?>

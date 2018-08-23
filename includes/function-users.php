@@ -64,9 +64,10 @@
 			while($row = $result->fetch_assoc()) {
 				$arr[] = new user($row['id'],$row['username'],$row['realname'],$row['email'],$row['permission'] );		
 			}
-		return $arr[0];
+			return $arr[0];
 		} else {
-			return "NotExist";
+			$_POST['error'] = "Not found";			
+			return null;
 		}		
 	}
 	
@@ -113,6 +114,12 @@
 		$rname = mysqli_real_escape_string($conn,$user->rname);		
 		$email = mysqli_real_escape_string($conn,$user->email);
 		$permission = mysqli_real_escape_string($conn,$user->permission);
+
+		if (CheckUserExist($uname))
+		{
+			$_POST['Error'] = "Felhasználónév foglalt!";
+			return null;
+		}
 		if ($sql->execute())
 		{
 			$_POST = array();
@@ -156,5 +163,19 @@
 		} else {
 			$_POST['Error'] = "Jelszó törlése sikertelen!";
 		}		
+	}
+
+	function CheckUserExist ($name)
+	{
+		global $conn;
+		$sql = "SELECT * FROM `Felhasznalok` WHERE `username` = '".$name."'";
+		$result = $conn->query($sql);
+		if ($result->num_rows > 0) {
+			return true;
+
+		} else {
+			return false;
+		}
+
 	}
 ?>

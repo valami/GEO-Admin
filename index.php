@@ -11,19 +11,20 @@
 	<body>		
 	
 	<?php
-		session_start();
-		include('./includes/function-users.php');
 
-		
+												
+		session_start();								
+		include('./includes/function-users.php');
+		$user = null;		
 		if (isset($_POST['username']))	{
-			$user= Login($_POST['username'],$_POST['password']);
-			if (! $user == "NotExist")
-			{				
+			$user = Login($_POST['username'],$_POST['password']);
+			if ( isset($user->uname) )
+			{
 				$_POST = array();
 				$_SESSION['uname'] = $user->uname;
-				$_SESSION['permission'] =  $user->permission;		
+				$_SESSION['permission'] =  $user->permission;	
+				$_SESSION['uid'] = $user->id;	
 				header("Location: ./devices.php"); 
-				exit();
 			} 
 		}
 	?>
@@ -37,7 +38,7 @@
 					</h1>
 					<form class="form-signin" action="" method="post">
 						<?php
-						if ($user == "NotExist")
+						if ($_POST['error'] == "Not found")
 						{
 							print "<span class='alert alert-danger help-block' role='alert'>Nem megfelelő felhasználónév vagy jelszó!</span>";
 						}

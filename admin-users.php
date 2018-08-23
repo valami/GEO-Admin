@@ -8,11 +8,16 @@
 	</head>
 	<body>
 		<?php
-			session_start();
 			$active = "Felhasznalok";
 			include('./includes/header.php');	
 			include('./includes/function-users.php');			
-			$_SESSION['permission']=9 ;		
+			if (isset($_SESSION['uname']) )
+			{
+				if ($_SESSION['permission'] < 8)
+				{
+					header("Location: index.php");
+				}
+			}
 			
 			//Rendezés
 			if (isset($_POST['order']))
