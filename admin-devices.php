@@ -8,17 +8,18 @@
 	</head>
 	<body>
 		<?php
+			session_start();
 			$active = "Eszkozok";
 			include('./includes/header.php');	
-			include('./includes/function-devices.php');			
+			include('./includes/function-devices.php');					
+
 			if (isset($_SESSION['uname']) )
 			{
-				if ($_SESSION['permission'] < 8)
+				if ( (int) $_SESSION['permission'] < 8)
 				{
 					header("Location: index.php");
 				}
 			}		
-			
 			//Rendezés
 			if (isset($_POST['order']))
 			{
@@ -34,12 +35,12 @@
 			{
 				switch (explode("_",$_POST['btn'])[0]) {
 					case "add":
-						require('./includes/dialog-devices-add.php');	
+						require('./includes/dialog-admin-devices-add.php');	
 						print "<script> $('#add').modal({show: true}) </script>";
 						break;
 					case "mod":
 						$SelectedDevice = SearchDevice (explode("_",$_POST['btn'])[1]);								
-						require('./includes/dialog-devices-mod.php');	
+						require('./includes/dialog-admin-devices-mod.php');	
 						print "<script> $('#mod').modal({show: true}) </script>";
 						break;				
 					case "del":
@@ -54,11 +55,13 @@
 			{
 				switch ($_POST['action']) {
 					case "add":						
-						AddDevice(new device(0,$_SESSION['uid'],$_POST["name"],"193.225.255.255",$_POST["mac"],1));
+						AddDevice(new device(0,$_POST["user"],$_POST["name"],$_POST["ip"],$_POST["mac"],1));
 						break;					
 					case "mod":
 						$SelectedDevice =SearchDevice ( $_POST['id']);
 						$SelectedDevice->SetName($_POST['name']);
+						$SelectedDevice->SetIP($_POST['ip']);
+						$SelectedDevice->SetMAC($_POST['mac']);
 						ModDevice($SelectedDevice);
 						break;					
 					case "del":

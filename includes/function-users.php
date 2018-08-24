@@ -176,6 +176,5 @@
 		} else {
 			return false;
 		}
-
 	}
 ?>

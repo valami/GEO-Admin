@@ -17,8 +17,7 @@
 			}
 
 			include('./includes/devices.php');		
-		
-			
+
 			//Rendezés
 			if (isset($_POST['order']))
 			{
@@ -54,7 +53,7 @@
 			{
 				switch ($_POST['action']) {
 					case "add":						
-						AddDevice(new device(0,$_SESSION['uid'],$_POST["name"],"193.225.255.255",$_POST["mac"],1));
+						AddDevice(new device(0,$_SESSION['uid'],$_POST["name"],FirstIP(),$_POST["mac"],1));
 						break;					
 					case "mod":
 						$SelectedDevice =SearchDevice ( $_POST['id']);

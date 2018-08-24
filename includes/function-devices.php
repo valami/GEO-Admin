@@ -31,6 +31,14 @@
 		{
 			$this->name = $_name;
 		}
+		function SetMAC($_mac)
+		{
+			$this->mac = $_mac;
+		}
+		function SetIP($_ip)
+		{
+			$this->ip = $_ip;
+		}
 
 		function GetUser ()
 		{
@@ -163,7 +171,7 @@
 	{
 		global $conn;
 		$sql = "UPDATE `Eszkozok` SET `user_id` = '".$device->uid."', `name` = '".$device->name."', `ip` = '".$device->ip."', `mac` = '".$device->mac."', `uplimit` = '".$device->uplimit."'  WHERE `id` = ".$device->id."";
-		if ($conn->query($sql) === TRUE) {
+ 		if ($conn->query($sql) === TRUE) {
 			$_POST = array();
 			echo  "<meta http-equiv='refresh' content='0'>";
 		} else {
@@ -187,17 +195,19 @@
 	function FirstIP()
 	{
 		global $conn;
-		$sql = "SELECT * FROM `Eszkozok` WHERE `id` = ".$id."" ;
+		$sql = "select INET_NTOA(min(id)) as min_ip from ( select 2887647489 id from Eszkozok where 2887647489 not in ( select inet_aton(ip) from Eszkozok) UNION select inet_aton(ip) + 1 id from Eszkozok where inet_aton(ip) + 1 not in ( select inet_aton(ip) from Eszkozok) and inet_aton(ip) > 2887647489 ) as min_ip" ;
+		//Láttál már valaha ennél csúnyábbat? mert én nem... Amúgy az első szabad IP-t keresi
 		$result = $conn->query($sql);			
 		$clients = array();
 		if ($result->num_rows > 0) {
 			while($row = $result->fetch_assoc()) {
-				$arr[] = new device($row["id"],$row["user_id"],$row["name"],$row["ip"],$row["mac"],$row["uplimit"]);
+				return $row["min_ip"];
 				break;
 			}
 		} else {
 			$_SESSION['error'] = "Hiba történt";
 		}
-		return $arr[0];
 	}
+
+	
 ?>

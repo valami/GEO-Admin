@@ -8,6 +8,7 @@
 	</head>
 	<body>
 		<?php
+			session_start();
 			$active = "Felhasznalok";
 			include('./includes/header.php');	
 			include('./includes/function-users.php');			
@@ -73,8 +74,7 @@
 						DelUser($_POST['id']);
 						break;
 				}
-			}
-			
+			}			
 		?>
 		
 		<div class="container static">		
@@ -95,8 +95,7 @@
 					<input class="form-control" id="keres" type="text" placeholder="Keresés..">
 				</div>    
 			</div>
-		</ol>
-		
+		</ol>	
 				
 			<table  class="table table-bordered" >
 			<thead>
